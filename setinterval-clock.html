@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Simple setInterval clock</title>
+    <style>
+      p {
+        font-family: sans-serif;
+      }
+      button:hover,
+      button:focus {
+          background: cornflowerblue;
+      }
+
+      button:focus {
+          outline: 1px solid #fff;
+          outline-offset: -4px;
+      }
+
+      button:active {
+          transform: scale(0.99);
+      }
+
+      button:disabled {
+          background: rgb(50, 50, 50);
+      }
+    </style>
+    <script defer src="out/setinterval-clock.js"></script>
+  </head>
+  <body>
+    <button id="start">Start</button>
+    <button id="stop">Pause/Stop</button>
+    <button id="reset">Reset</button>
+    <p class="clock"></p>
+    
+  </body>
+</html>
