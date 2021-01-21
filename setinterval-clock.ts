@@ -1,63 +1,109 @@
+// Data structure to encapsulate stopwatch properties
+interface StopWatch {
+    interval: number,
+    startTime: number,
+    elapsedTime: number,
+    startButton: HTMLButtonElement,
+    stopButton: HTMLButtonElement,
+    resetButton: HTMLButtonElement,
+    clockElement: HTMLParagraphElement,
+    lastButtonClicked?: Button
+}
+
+// Available buttons
+enum Button {
+    Start,
+    Stop,
+    Reset
+}
+
+// Entry into program
 function Main() {
-    // Declare and initialize button variables
-    let startButton: HTMLButtonElement = document.querySelector('#start');
-    let stopButton: HTMLButtonElement = document.querySelector('#stop');
-    let resetButton: HTMLButtonElement = document.querySelector('#reset');
-    let clockElement: HTMLParagraphElement = document.querySelector('.clock');
-    let interval:number = 0;
+    // Declare and initialize stopwatch object
+    let stopWatch: StopWatch = {
+        interval: 0,
+        startTime: undefined,
+        elapsedTime: undefined,
+        startButton: document.querySelector('#start'),
+        stopButton: document.querySelector('#stop'),
+        resetButton: document.querySelector('#reset'),
+        clockElement: document.querySelector('.clock'),
+    }
 
     // Add click event listener to buttons
-    startButton.addEventListener('click', () => Start(clockElement, interval));
-    stopButton.addEventListener('click', () => Stop(interval));
-    resetButton.addEventListener('click', () => Reset(interval));
+    stopWatch.startButton.addEventListener('click', () => Start(stopWatch));
+    stopWatch.stopButton.addEventListener('click', () => Stop(stopWatch));
+    stopWatch.resetButton.addEventListener('click', () => Reset(stopWatch));
 }
 
+// Start button
+function Start(stopWatch: StopWatch): void {
+    // Disable the Start button
+    stopWatch.startButton.disabled = true;
 
+    // Select start time based on last button clicked
+    switch(+stopWatch.lastButtonClicked) {
+        case Button.Stop:
+            stopWatch.startTime = Date.now() - stopWatch.elapsedTime;
+            break;
 
-function Start(clockElement: HTMLParagraphElement, interval: number) {
-    // Declare and initialize counter and interval
-    let startTime: number = Date.now();
-
-    interval = setInterval(function(startTime: number) {
+        default:
+            stopWatch.startTime = Date.now();
+    }
+    
+    // Update stopwatch time every second
+    stopWatch.interval = setInterval(function(startTime: number) {
         let currentTime = Date.now();
-        let elapsedTime = currentTime - startTime;
+        stopWatch.elapsedTime = currentTime - startTime;
 
-        let hours: number = CalculateHours(elapsedTime);
-        let minutes: number = CalculateMinutes(elapsedTime, hours);
-        let seconds: number = CalculateSeconds(elapsedTime, hours, minutes);
-//https://stackoverflow.com/questions/2998784/how-to-output-numbers-with-leading-zeros-in-javascript
-        alert(`${hours} hr, ${minutes} min & ${seconds}`)
+        let formatTime = GetFormattedTime(stopWatch.elapsedTime);
+        stopWatch.clockElement.textContent = formatTime;
 
-    }, 1000, startTime);
+    }, 1000, stopWatch.startTime);
+
+    // Update last button clicked
+    stopWatch.lastButtonClicked = Button.Start;
 }
 
+// Stop button
+function Stop(stopWatch: StopWatch): void {
+    // Enable the Start button
+    stopWatch.startButton.disabled = false;
 
+    // Clear the stopwatch interval
+    clearInterval(stopWatch.interval);
 
-function Stop(interval: number) {
-
+    // Reset start time and last button clicked
+    stopWatch.startTime = undefined;
+    stopWatch.lastButtonClicked = Button.Stop;
 }
 
-function Reset(interval: number) {
+// Reset button
+function Reset(stopWatch: StopWatch) {
+    // Enable the Start button
+    stopWatch.startButton.disabled = false;
 
+    // Clear the stopwatch interval
+    clearInterval(stopWatch.interval);
+
+    // Reset the start and elapsed times
+    stopWatch.startTime = undefined;
+    stopWatch.elapsedTime = undefined;
+
+    // Set the clock element time back to zero
+    stopWatch.clockElement.textContent = GetFormattedTime(0);
+
+    // Set the last button clicked
+    stopWatch.lastButtonClicked = Button.Reset;
 }
 
-function CalculateHours(elapsedTime: number): number {
-    // Convert milliseconds to hours
-    return Math.floor((elapsedTime / 1000) / 3600);
-}
+// Format elapsed time
+function GetFormattedTime(elapsedTime: number): string {
+    let hours: number =  Math.floor((elapsedTime / 1000) / 3600);
+    let minutes: number = Math.floor(((elapsedTime - (hours * 3600 * 1000)) / 1000) / 60);
+    let seconds: number = Math.floor((elapsedTime - (hours * 3600 * 1000) - (minutes * 60 * 1000)) / 1000);
 
-function CalculateMinutes(elapsedTime: number, hours?: number): number {
-    // Convert remaining milliseconds to minutes
-    return Math.floor(((elapsedTime - (hours * 3600 * 1000)) / 1000) / 60);
-}
-
-function CalculateSeconds(elapsedTime: number, hours?: number, minutes?: number): number {
-    // Convert remaining milliseconds to seconds
-    return Math.floor((elapsedTime - (hours * 3600 * 1000) - (minutes * 60 * 1000)) / 1000);
-}
-
-function FormatTime() {
-
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
 Main();
