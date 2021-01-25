@@ -28,12 +28,10 @@
             });
         };
 
-        timeoutPromise('Hi, Zenk!', 3000)
+        timeoutPromise('', 3000)
         .then((message: string) => {
             alert(message);
         })
-        .catch((e: any) => {
-            console.log('Error: ' + e);
-        });
+        .catch(console.log);
     }
 )();

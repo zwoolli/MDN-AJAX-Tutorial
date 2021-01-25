@@ -4,7 +4,7 @@ function loadAsset(url, type, callback) {
     xhr.responseType = type;
 
     xhr.onload = function() {
-    callback(xhr.response);
+        callback(xhr.response);
     };
 
     xhr.send();
